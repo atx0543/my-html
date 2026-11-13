@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXUS 翻訳 — 日⇄英 AI Translator</title>
+<title>NEXUS 翻訳 ・ 日⇔英 AI Translator</title>
 <script>
   // テーマのちらつき防止（描画前に適用）
   (() => {
@@ -81,7 +81,7 @@
   }
   .grid{position:fixed;inset:0;z-index:-1;
     background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),
-                     linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+                      linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
     background-size:48px 48px;
     mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);
   }
@@ -146,7 +146,7 @@
   .switch input:checked + .track{background:var(--grad)}
   .switch input:checked + .track::after{transform:translateX(18px)}
 
-  /* ===== Direction bar ===== */
+  /* ===== Direction bar & Swap button ===== */
   .direction{
     display:flex;align-items:center;justify-content:center;gap:18px;
     margin:4px auto 18px;font-family:"Space Grotesk","Noto Sans JP",sans-serif;
@@ -157,10 +157,18 @@
     font-weight:500;letter-spacing:.05em;transition:.4s;
   }
   .lang-pill.active{border-color:rgba(34,230,255,.6);box-shadow:0 0 24px rgba(34,230,255,.25)}
-  .arrow{
-    width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
-    background:var(--grad);box-shadow:0 0 24px rgba(139,92,255,.5);
+  .swap-btn{
+    width:46px;height:46px;border-radius:50%;display:grid;place-items:center;
+    background:var(--grad);border:none;cursor:pointer;color:#fff;
+    box-shadow:0 0 24px rgba(139,92,255,.5);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .2s;
   }
+  .swap-btn:hover{
+    box-shadow:0 0 32px rgba(34,230,255,.7);
+    transform:scale(1.08);
+  }
+  .swap-btn:active{transform:scale(0.95)}
+  .swap-btn.rotated{transform:rotate(180deg)}
   .detect-tag{font-size:10px;color:var(--accent);display:block;letter-spacing:.2em;margin-bottom:2px}
 
   /* ===== Main panels ===== */
@@ -341,7 +349,7 @@
     <div class="logo-mark">訳</div>
     <div>
       <h1><span>NEXUS</span> 翻訳</h1>
-      <small>JAPANESE ⇄ ENGLISH TRANSLATOR</small>
+      <small>JAPANESE ⇔ ENGLISH TRANSLATOR</small>
     </div>
   </div>
   <div class="controls">
@@ -374,7 +382,7 @@
         <option value="auto">自動（推奨）</option>
         <option value="native">ブラウザ標準（Chrome/Edge）</option>
         <option value="whisper-tiny">Whisper 軽量（約40MB）</option>
-        <option value="whisper-base">Whisper 標準（約80MB）</option>
+        <option value="whisper-base">Whisper 標準（約70MB）</option>
         <option value="whisper-small">Whisper 高精度（約250MB）</option>
       </select>
     </div>
@@ -395,7 +403,11 @@
 
 <div class="direction">
   <div class="lang-pill" id="srcPill"><span class="detect-tag">AUTO DETECT</span><span id="srcName">言語を自動検出</span></div>
-  <div class="arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+  <button class="swap-btn" id="swapBtn" title="原文と翻訳結果を入れ替え (Ctrl+Shift+S)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 10h14l-4-4M17 14H3l4 4"/>
+    </svg>
+  </button>
   <div class="lang-pill" id="tgtPill"><span class="detect-tag">TRANSLATE TO</span><span id="tgtName">—</span></div>
 </div>
 
@@ -455,12 +467,16 @@
       <button class="btn icon-btn" id="copyBtn" title="翻訳をコピー">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       </button>
+      <button class="btn" id="swapBtnFoot" title="翻訳結果を左の原文欄へ移動して入れ替え (Ctrl+Shift+S)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h14l-4-4M17 14H3l4 4"/></svg>
+        原文と入れ替え
+      </button>
       <span class="count" id="tgtCount">0 文字</span>
     </div>
   </section>
 </main>
 
-<footer><kbd>Ctrl</kbd> + <kbd>Enter</kbd> 翻訳 ・ <kbd>Ctrl</kbd> + <kbd>M</kbd> 音声入力 ・ <kbd>Ctrl</kbd> + <kbd>H</kbd> 履歴 ・ 日本語／英語を自動判別</footer>
+<footer><kbd>Ctrl</kbd> + <kbd>Enter</kbd> 翻訳 ・ <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> 左右入れ替え ・ <kbd>Ctrl</kbd> + <kbd>M</kbd> 音声入力 ・ <kbd>Ctrl</kbd> + <kbd>H</kbd> 履歴</footer>
 
 <!-- ===== History drawer ===== -->
 <div class="overlay" id="overlay"></div>
@@ -536,6 +552,41 @@
     return lang;
   }
 
+  /* ---------- Swap (左右の文書入れ替え) ---------- */
+  function swapTexts() {
+    const srcText = source.value;
+    const tgtText = lastResult.text;
+
+    if (!srcText.trim() && !tgtText.trim()) {
+      return toast('入れ替えるテキストがありません');
+    }
+    if (!tgtText.trim()) {
+      return toast('右側の翻訳結果がまだありません');
+    }
+
+    stopSpeaking();
+    requestId++;
+    clearTimeout(debounceTimer);
+
+    // アイコンの回転アニメーション
+    $('swapBtn').classList.toggle('rotated');
+
+    // 左（原文）と右（翻訳結果）を入れ替え
+    const prevSrcLang = detectLang(srcText) || (lastResult.lang === 'ja' ? 'en' : 'ja');
+    source.value = tgtText;
+    setOutput(srcText);
+    lastResult = { text: srcText, lang: prevSrcLang };
+
+    // 自動認識を更新（左に入った言語を自動判定して表示）
+    updateDirection();
+    $('engineBadge').innerHTML = 'SWAPPED ⇄';
+    source.focus();
+    toast('⇄ 原文と翻訳結果を入れ替えました');
+  }
+
+  $('swapBtn').addEventListener('click', swapTexts);
+  $('swapBtnFoot').addEventListener('click', swapTexts);
+
   /* ---------- Chunking (長文対応) ---------- */
   function chunkText(text, max) {
     const parts = text.split(/(?<=[。．！？!?.\n])/);
@@ -563,7 +614,7 @@
     $('mmRemove').style.display = email ? '' : 'none';
     $('mmSave').textContent = email ? '更新' : '登録';
     status.className = 'email-status ' + (email ? 'on' : 'off');
-    status.textContent = email ? '✔ 50,000字/日' : '5,000字/日';
+    status.textContent = email ? '✓ 50,000字/日' : '5,000字/日';
   }
   function saveEmail() {
     const input = $('mmEmail');
@@ -574,7 +625,7 @@
     }
     localStorage.setItem(EMAIL_KEY, v);
     refreshEmailUI();
-    toast('✉ 登録しました — MyMemory 上限 50,000字/日');
+    toast('✓ 登録しました — MyMemory 上限 50,000字/日');
   }
 
   /* ---------- Engines ---------- */
@@ -708,7 +759,7 @@
     const list = q ? history.filter(h => h.src.toLowerCase().includes(q) || h.out.toLowerCase().includes(q)) : history;
     $('historyInfo').textContent = q ? `${list.length} / ${history.length} 件` : `${history.length} 件`;
     if (!list.length) {
-      $('historyList').innerHTML = `<div class="h-empty"><span class="big">${q ? '🔍' : '🕘'}</span>${q ? '一致する履歴がありません' : 'まだ履歴はありません<br>翻訳すると自動で保存されます'}</div>`;
+      $('historyList').innerHTML = `<div class="h-empty"><span class="big">${q ? '🔍' : '📜'}</span>${q ? '一致する履歴がありません' : 'まだ履歴はありません<br>翻訳すると自動で保存されます'}</div>`;
       return;
     }
     $('historyList').innerHTML = list.map(h => `
@@ -747,7 +798,7 @@
       return toast('🗑 履歴を削除しました');
     }
     if (e.target.closest('.copy')) {
-      try { await navigator.clipboard.writeText(h.out); toast('✔ 翻訳をコピーしました'); }
+      try { await navigator.clipboard.writeText(h.out); toast('✓ 翻訳をコピーしました'); }
       catch { toast('コピーに失敗しました'); }
       return;
     }
@@ -761,7 +812,7 @@
     lastResult = { text: h.out, lang: h.tl };
     $('engineBadge').innerHTML = `HISTORY · <em>${esc(h.engine || '')}</em>`;
     closeDrawer();
-    toast('🕘 履歴を復元しました');
+    toast('📜 履歴を復元しました');
   });
   $('clearHistory').addEventListener('click', () => {
     if (!history.length) return;
@@ -931,7 +982,7 @@
   const whisperCache = {};
   let wRec = null, modelPct = null, srcLoaderOn = false;
   // 無音時に Whisper が出しがちな定型文を除外
-  const HALLUCINATION = /^[\s。、.!！]*(ご視聴ありがとうございました|チャンネル登録.*|字幕.*|thanks for watching|\[.*\]|\(.*\)|（.*）)[\s。、.!！]*$/i;
+  const HALLUCINATION = /^[\s。、!！]*(ご視聴ありがとうございました|チャンネル登録.*|字幕.*|thanks for watching|\[.*\]|\(.*\)|♪.*♪)[\s。、!！]*$/i;
 
   function onModelProgress(pct) {
     modelPct = pct;
@@ -1071,8 +1122,9 @@
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && $('drawer').classList.contains('open')) closeDrawer();
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'm') { e.preventDefault(); toggleMic(); }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 's') { e.preventDefault(); swapTexts(); }
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'm') { e.preventDefault(); toggleMic(); }
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'h') {
       e.preventDefault();
       $('drawer').classList.contains('open') ? closeDrawer() : openDrawer();
     }
@@ -1117,7 +1169,7 @@
   });
   $('copyBtn').addEventListener('click', async () => {
     if (!lastResult.text) return toast('コピーする翻訳がありません');
-    try { await navigator.clipboard.writeText(lastResult.text); toast('✔ 翻訳をコピーしました'); }
+    try { await navigator.clipboard.writeText(lastResult.text); toast('✓ 翻訳をコピーしました'); }
     catch { toast('コピーに失敗しました'); }
   });
   $('engine').addEventListener('change', () => { if (source.value.trim()) translate(); });
